@@ -23,7 +23,7 @@ from plant_input_funcs import (regrid_yields, convert_joe_plant_inputs_to_nc, sp
                                                                                         split_check_sowing_dates)
 from make_biofuel_inpt_file import main_biofuel
 from jennifer_fns import filter_openfoodfacts_csv, edit_mngmnt
-from jon_fns import copy_jon_lta_data, copy_jon_wthr_data, create_bash_script, identify_ssd
+from jon_fns import copy_jon_lta_data, copy_jon_wthr_data, create_bash_script, identify_ssd, integrity_check
 
 WARNING_STR = '*** Warning *** '
 
@@ -209,6 +209,12 @@ class Form(QWidget):
         w_biofuel.clicked.connect(self.biofuelDatasetClicked)
 
         irow += 1
+        w_integrity = QPushButton('Integrity')
+        helpText = 'check data Integrity'
+        w_integrity.setToolTip(helpText)
+        grid.addWidget(w_integrity, irow, 0)
+        w_integrity.clicked.connect(self.dataIntegrity)
+
         icol = 1
         w_edt_mngmnt = QPushButton('Edit mngmnt file')
         helpText = 'Edit management file'
@@ -267,6 +273,14 @@ class Form(QWidget):
             self.close()
             sys.exit()
 
+    def dataIntegrity(self):
+        """
+        C
+         """
+        integrity_check(self)
+
+        return
+
     def fetchOutDir(self):
         """
         select output directory
@@ -283,12 +297,13 @@ class Form(QWidget):
         """
         check SSD is accessible
         """
+        out_dir = self.w_lbl_outdir.text()
         ssd_found, use_drive, prtbl_ssd = identify_ssd()
         if ssd_found:
             if lta_flag:
-                copy_jon_lta_data(self, use_drive)
+                copy_jon_lta_data(self, use_drive, out_dir)
             else:
-                copy_jon_wthr_data(self, use_drive)
+                copy_jon_wthr_data(self, use_drive, out_dir)
         else:
             print(WARNING_STR + prtbl_ssd + ' not accessible')
 
