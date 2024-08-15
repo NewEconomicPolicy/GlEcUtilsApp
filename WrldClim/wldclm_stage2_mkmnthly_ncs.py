@@ -35,16 +35,13 @@ FUT_YR_SPANS = list(['2021-2040', '2041-2060','2061-2080', '2081-2100'])
 METRICS = ['prec', 'tmax', 'tmin']
 MISSING_VALUE = -999.0
 
-def make_wrldclim_dsets(form):
+def make_wrldclim_dsets(form, gcm, ssp):
     """
 
     """
     delete_flag = form.w_del_nc.isChecked()
 
-    ssp = form.w_combo10.currentText()
-    gcm = form.w_combo11.currentText()
-
-    out_dir = join(form.settings['wthr_dir'], 'outputs', 'Monthly')
+    out_dir = join(form.settings['wthr_dir'], 'outputs', 'Monthly', gcm, ssp)
     if not isdir(out_dir):
         makedirs(out_dir)
 
@@ -53,7 +50,7 @@ def make_wrldclim_dsets(form):
     out_fut_fn = None
     out_nc_dset = None
     if form.w_pop_fut.isChecked():
-        fut_inp_dir = join(form.settings['wthr_dir'], 'Fut', gcm, 'NCs')
+        fut_inp_dir = join(form.settings['wthr_dir'], 'Fut', gcm, ssp, 'NCs')
         for metric in METRICS:
             frst_flag = True
             for yr_span in FUT_YR_SPANS:
@@ -147,14 +144,16 @@ def _create_new_fut_nc(clone_fn, out_dir, metric, yr_span, delete_flag):
     fn_new_root = ('_').join(fn_root_list)
 
     out_fut_fn = join(out_dir, fn_new_root + '.nc')
-    if isfile(out_fut_fn) and delete_flag:
-        try:
-            remove(out_fut_fn)
-        except PermissionError as err:
-            print(ERROR_STR + str(err))
-            return None
+    if isfile(out_fut_fn):
+        if delete_flag:
+            try:
+                remove(out_fut_fn)
+            except PermissionError as err:
+                print(ERROR_STR + str(err))
+                return None
+        else:
+            print(WARNING_STR + out_fut_fn + ' already exists')
 
-    print('\ncreating new dataset: ' + out_fut_fn)
     create_new_nc(clone_fn, out_fut_fn, metric, strt_yr, nmnths)
 
     return out_fut_fn
@@ -181,26 +180,27 @@ def _create_new_hist_nc(clone_fn, out_dir, metric, nmnths, delete_flag):
     extent = '_' + yr_str + '-' + str(int(yr_str) + round(nmnths/12) - 1)
 
     out_hist_fn = join(out_dir, fn_root.rstrip('_' + yr_mnth) + extent + '.nc')
-    if isfile(out_hist_fn) and delete_flag:
-        try:
-            remove(out_hist_fn)
-        except PermissionError as err:
-            print(ERROR_STR + str(err))
-            return None
+    if isfile(out_hist_fn):
+        if delete_flag:
+            try:
+                remove(out_hist_fn)
+            except PermissionError as err:
+                print(ERROR_STR + str(err))
+                return None
+        else:
+            print(WARNING_STR + out_hist_fn + ' already exists')
 
-    print('\ncreating new dataset: ' + out_hist_fn)
     create_new_nc(clone_fn, out_hist_fn, metric, int(yr_str), nmnths)
 
     return out_hist_fn
 
-def make_tave_from_tmax_tmin(form):
+def make_tave_from_tmax_tmin(form, gcm, ssp):
     """
 
     """
     delete_flag = form.w_del_nc.isChecked()
-    ssp = form.w_combo10.currentText()
 
-    out_dir = join(form.settings['wthr_dir'], 'outputs', 'Monthly')
+    out_dir = join(form.settings['wthr_dir'], 'outputs', 'Monthly', gcm, ssp)
     if not isdir(out_dir):
         makedirs(out_dir)
 
@@ -221,12 +221,15 @@ def make_tave_from_tmax_tmin(form):
 
         # create new NC file and copy contents of clone to same
         # =====================================================
-        if isfile(tave_nc) and delete_flag:
-            try:
-                remove(tave_nc)
-            except PermissionError as err:
-                print(ERROR_STR + str(err))
-                return None
+        if isfile(tave_nc):
+            if delete_flag:
+                try:
+                    remove(tave_nc)
+                except PermissionError as err:
+                    print(ERROR_STR + str(err))
+                    return None
+            else:
+                print(WARNING_STR + tave_nc + ' already exists')
 
         strt_yr, end_yr, nmnths = fetch_yrs_extent_from_fn(tmax_nc)
         retcode = create_new_nc(tmax_nc, tave_nc, metric, strt_yr, nmnths)

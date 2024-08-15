@@ -14,62 +14,41 @@ __author__ = 's03mm5'
 
 from calendar import monthrange
 from _datetime import datetime
-from statistics import mean, StatisticsError
 from numpy import arange
 from locale import format_string
 from time import time
 from sys import stdout
 
-missing_value = -999.0
-imiss_value = int(missing_value)
+def get_gcm_ssp_lists(form, all_gcms, all_ssps):
+    """
+    return gcm and ssp lists from GUI
+    """
+    gcm_gui = form.w_combo11.currentText()
+    ssp_gui = form.w_combo10.currentText()
 
-ROOT_WTHR = 'D:\\GlobalEcosseData\\'
-HARMONIE = ROOT_WTHR + 'HARMONIE_V2\\Monthly\\'
-ECLIPS_OUT = ROOT_WTHR + 'ECLIPS2_GlEc\\Monthly\\'
+    gcm_list = []
+    ssp_list = []
 
-PREFIX = 'ECLIPS2_0_'
-GCMS = ['CLMcom_CCLM', 'CLMcom_CLM', 'DMI_HIRAM','KMNI_RAMCO','MPI_CSC_REMO2009']
-YEAR_RANGE = '_1961_2100'
-SCENARIOS = {'RCP60':'_6.0', 'RCP45':'_4.5', 'RCP26':'_2.6', 'RCP85':'_8.5'}
+    if form.w_all_gcms.isChecked():
+        for gcm in all_gcms:
+            gcm_list.append(gcm)
+        ssp_list.append(ssp_gui)
 
-def daily_to_monthly(val_list, metric, nmonths):
-    '''
-    take days extents from HARMONIE daily datasets 41 years 365 + 12 leap years
-    '''
-    indx1 = 0
-    imnth = 1
-    monthly_vals = []
-    for indx_mnth in range(nmonths):
-        frst_day, num_days = monthrange(2011, imnth)
-        indx2 = indx1 + num_days
-        if metric == 'soc':
-            try:
-                monthly_vals.append(mean(val_list[indx1:indx2]))
-            except StatisticsError as err:
-                print(err)
-                return None
-        else:
-            monthly_vals.append(sum(val_list[indx1:indx2]))  # flux
-        indx1 += num_days
-        imnth += 1
-        if imnth > 12:
-            imnth = 1
+    elif form.w_all_ssps.isChecked():
+        for ssp in all_ssps:
+            ssp_list.append(ssp)
+        gcm_list.append(gcm_gui)
 
-    return monthly_vals
+    else:
+        gcm_list.append(gcm_gui)
+        ssp_list.append(ssp_gui)
 
-def generate_daily_atimes(fut_start_year):
-    '''
-    take days extents from HARMONIE daily datasets 41 years 365 + 12 leap years
-    '''
-    nday_strt = 25202; nday_end = 43098
-    atimes = arange(nday_strt, nday_end + 1)     # create ndarray
-
-    return atimes
+    return gcm_list, ssp_list
 
 def generate_mnthly_atimes(fut_start_year, num_months):
-    '''
+    """
     expect 1092 for 91 years plus 2 extras for 40 and 90 year differences
-    '''
+    """
 
     atimes = arange(num_months)     # create ndarray
     atimes_strt = arange(num_months)
@@ -98,39 +77,10 @@ def generate_mnthly_atimes(fut_start_year, num_months):
 
     return atimes, atimes_strt, atimes_end
 
-def generate_yearly_atimes(fut_start_year, num_years):
-    '''
-    expect 1092 for 91 years plus 2 extras for 40 and 90 year differences
-    '''
-
-    atimes = arange(num_years)     # create ndarray
-    atimes_strt = arange(num_years)
-    atimes_end  = arange(num_years)
-
-    date_1900 = datetime(1900, 1, 1, 12, 0)
-    year = fut_start_year
-    prev_delta_days = -999
-    for indx in arange(num_years + 1):
-        date_this = datetime(year, 1, 1, 12, 0)
-        delta = date_this - date_1900   # days since 1900-01-01
-
-        # add half number of days in this month to the day of the start of the month
-        # ==========================================================================
-        if indx > 0:
-            atimes[indx-1] = prev_delta_days + int((delta.days - prev_delta_days)/2)
-            atimes_strt[indx-1] = prev_delta_days
-            atimes_end[indx-1] =  delta.days - 1
-
-        prev_delta_days = delta.days
-        year += 1
-
-    return atimes, atimes_strt, atimes_end
-
-
 def update_progress(last_time, time_indx, nsteps):
-    '''
+    """
     Update progress bar
-    '''
+    """
     this_time = time()
     if (this_time - last_time) > 5.0:
         remain_str = format_string("%d", nsteps - time_indx, grouping=True)

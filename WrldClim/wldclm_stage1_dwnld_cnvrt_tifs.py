@@ -55,28 +55,31 @@ PERIODS_HIST = list(['1950-1959', '1960-1969', '1970-1979', '1980-1989', '1990-1
                                                 '2000-2009', '2010-2019', '2020-2021'])
 
 # ============================================================================
-def download_fut_tifs(form):
+def download_fut_tifs(form, gcm, ssp):
     """
     C
     """
-    if form.w_all_ssps.isChecked():
-        pass
-    if form.w_all_gcms.isChecked():
-        pass
+    delete_flag = form.w_del_nc.isChecked()
+    initial_dir, tif_dir, nc_dir, stdout_fname = _setup_downloads(ROOT_DIR_FUT, gcm, ssp)
 
-    gcm = form.w_combo11.currentText()
-    ssp = form.w_combo10.currentText()
-    initial_dir, tif_dir, nc_dir, stdout_fname = _setup_downloads(ROOT_DIR_FUT, gcm)
-
-    print('Downloading future climate datasets for gcm: ' + gcm + '\tssp: ' + ssp)
+    print('\nDownloading future climate datasets for gcm: ' + gcm + '\tssp: ' + ssp)
     ndown_load = 0
     for metric in METRICS:
         for period in PERIODS_FUT:
             fn = 'wc2.1_10m_' + metric + '_' + gcm + '_ssp' + ssp + '_' + period + '.tif'
-            out_fn = join(tif_dir, gcm, fn)
+            out_fn = join(tif_dir, fn)
             if isfile(out_fn):
-                print(WARNING_STR + fn + ' already exists')
-                continue
+                mess = WARNING_STR + fn + ' already exists'
+                if delete_flag:
+                    print(mess + ' - will delete')
+                    try:
+                        remove(out_fn)
+                    except PermissionError as err:
+                        print(ERROR_STR + str(err))
+                        return None
+                else:
+                    print(mess)
+                    continue
 
             url = URL_FUT + gcm + '/ssp' + ssp + '/' + fn
             cmd = WGET + ' -q ' + url
@@ -90,7 +93,7 @@ def download_fut_tifs(form):
 
     # convert tifs to NC
     # ==================
-    nc_dir = join(ROOT_DIR, 'Fut', gcm, 'NCs')
+    nc_dir = join(ROOT_DIR, 'Fut', gcm, ssp, 'NCs')
     _cnvrt_tif_wthr_ncs(tif_dir, nc_dir)
 
     return
@@ -127,16 +130,16 @@ def download_hist_tifs(form):
 
     return
 
-def _setup_downloads(root_dir, gcm=None):
+def _setup_downloads(root_dir, gcm=None, ssp=None):
     """
     works for both historic and gcm data
     """
-    if gcm is None:
+    if gcm is None:     # historic
         nc_dir = join(root_dir, 'NCs')
         tif_dir = join(root_dir, 'tifs')
-    else:
-        nc_dir = join(root_dir, gcm, 'NCs')
-        tif_dir = join(root_dir, gcm, 'tifs')
+    else:               # gcm data
+        nc_dir = join(root_dir, gcm, ssp, 'NCs')
+        tif_dir = join(root_dir, gcm, ssp, 'tifs')
 
     if not isdir(tif_dir):
         makedirs(tif_dir, exist_ok=True)

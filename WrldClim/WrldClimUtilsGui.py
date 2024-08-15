@@ -19,6 +19,7 @@ from PyQt5.QtWidgets import (QLabel, QWidget, QApplication, QHBoxLayout, QVBoxLa
 from initialise_wrldclim_utils import initiation, read_config_file, write_config_file
 from wldclm_stage2_mkmnthly_ncs import make_wrldclim_dsets, make_tave_from_tmax_tmin
 from wldclm_stage1_dwnld_cnvrt_tifs import download_hist_tifs, download_fut_tifs
+from nc_low_level_fns import get_gcm_ssp_lists
 
 WDGT_SIZE_60 = 60
 WDGT_SIZE_90 = 90
@@ -76,9 +77,9 @@ class Form(QWidget):
         # settings check boxes
         # ====================
         irow += 1
-        w_del_nc = QCheckBox('Overwrite existing dsets')
+        w_del_nc = QCheckBox('Delete existing dsets')
         grid.addWidget(w_del_nc, irow, 1, 1, 2)
-        helpText = 'Overwrite existing datasets'
+        helpText = 'If a dataset already exists, then remove it'
         w_del_nc.setToolTip(helpText)
         w_del_nc.setChecked(True)
         self.w_del_nc = w_del_nc
@@ -232,22 +233,34 @@ class Form(QWidget):
 
     def dwnldHist(self):
         """
-        C
+        stage 1
         """
         download_hist_tifs(self)
 
     def dwnldFut(self):
         """
-        C
+        stage 1
         """
-        download_fut_tifs(self)
+        gcm_list, ssp_list = get_gcm_ssp_lists(self, GCM_LIST, SSP_LIST)
+
+        for gcm in gcm_list:
+            for ssp in ssp_list:
+                download_fut_tifs(self, gcm, ssp)
+
+        return
 
     def makeNcs(self):
         """
-        C
+        stage 2
         """
-        make_wrldclim_dsets(self)
-        make_tave_from_tmax_tmin(self)
+        gcm_list, ssp_list = get_gcm_ssp_lists(self, GCM_LIST, SSP_LIST)
+
+        for gcm in gcm_list:
+            for ssp in ssp_list:
+                make_wrldclim_dsets(self, gcm, ssp)
+                make_tave_from_tmax_tmin(self, gcm, ssp)
+
+        return
 
     def exitClicked(self, exit_flag):
         """
