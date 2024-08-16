@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Name:        eclips_classes.py
 # Purpose:     Functions to create and write to netCDF files and return latitude and longitude indices
 # Author:      Mike Martin
@@ -6,7 +6,7 @@
 # Description: create dimensions: "longitude", "latitude" and "time"
 #              create five ECOSSE variables i.e. 'n2o','soc','co2', 'no3', and 'ch4'
 # Licence:     <your licence>
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 
 __prog__ = 'wldclm_stage1_dwnld_cnvrt_tifs.py'
 __version__ = '0.0.0'
@@ -34,22 +34,14 @@ ERROR_STR = '*** Error *** '
 MISSING_VALUE = -999.0
 METRICS = list(['prec', 'tmax', 'tmin'])
 
-WGET = 'D:\\Freeware\\UnxUtils\\usr\\local\\wbin\\wget.exe'
-
-ROOT_DIR = 'D:\\WldClim\\'
-
 URL_ROOT = 'https://geodata.ucdavis.edu/'       # useful URL: https://geodata.ucdavis.edu/climate/worldclim/2_1/
 
 # ================= future climate =====================================
-ROOT_DIR_FUT = ROOT_DIR + 'Fut\\'
-
 URL_FUT = URL_ROOT + 'cmip6/10m/'
 SSP = 'ssp585'
 PERIODS_FUT = list(['2021-2040', '2041-2060', '2061-2080', '2081-2100'])
 
 # ================= historic weather =====================================
-ROOT_DIR_HIST = ROOT_DIR + 'Hist\\'
-
 URL_HIST = URL_ROOT + 'hist/cts4.06/10m/'
 PERIODS_HIST = list(['1950-1959', '1960-1969', '1970-1979', '1980-1989', '1990-1999',
                                                 '2000-2009', '2010-2019', '2020-2021'])
@@ -59,8 +51,12 @@ def download_fut_tifs(form, gcm, ssp):
     """
     C
     """
+    root_dir = form.settings['wthr_dir']
+    root_dir_fut = join(root_dir, 'fut')
+    wget_exe = form.settings['wget_exe']
+
     delete_flag = form.w_del_nc.isChecked()
-    initial_dir, tif_dir, nc_dir, stdout_fname = _setup_downloads(ROOT_DIR_FUT, gcm, ssp)
+    initial_dir, tif_dir, nc_dir, stdout_fname = _setup_downloads(root_dir_fut, gcm, ssp)
 
     print('\nDownloading future climate datasets for gcm: ' + gcm + '\tssp: ' + ssp)
     ndown_load = 0
@@ -82,7 +78,7 @@ def download_fut_tifs(form, gcm, ssp):
                     continue
 
             url = URL_FUT + gcm + '/ssp' + ssp + '/' + fn
-            cmd = WGET + ' -q ' + url
+            cmd = wget_exe + ' -q ' + url
             if not form.w_rprt_only.isChecked():
                 tstrt = time()
                 call(cmd)
@@ -93,7 +89,7 @@ def download_fut_tifs(form, gcm, ssp):
 
     # convert tifs to NC
     # ==================
-    nc_dir = join(ROOT_DIR, 'Fut', gcm, ssp, 'NCs')
+    nc_dir = join(root_dir, 'Fut', gcm, ssp, 'NCs')
     _cnvrt_tif_wthr_ncs(tif_dir, nc_dir)
 
     return
@@ -102,7 +98,11 @@ def download_hist_tifs(form):
     """
     download and unzip
     """
-    initial_dir, tif_dir, nc_dir, stdout_fname = _setup_downloads(ROOT_DIR_HIST)
+    root_dir = form.settings['wthr_dir']
+    root_dir_hist = join(root_dir, 'hist')
+    wget_exe = form.settings['wget_exe']
+
+    initial_dir, tif_dir, nc_dir, stdout_fname = _setup_downloads(root_dir_hist)
 
     print('Downloading historic datasets')
     ndown_load = 0
@@ -115,7 +115,7 @@ def download_hist_tifs(form):
                 continue
 
             url = URL_HIST + fn
-            cmd = WGET + ' -q ' + url
+            cmd = wget_exe + ' -q ' + url
             if not form.w_rprt_only.isChecked():
                 tstrt = time()
                 call(cmd)

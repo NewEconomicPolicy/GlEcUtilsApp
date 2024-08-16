@@ -20,6 +20,7 @@ from initialise_wrldclim_utils import initiation, read_config_file, write_config
 from wldclm_stage2_mkmnthly_ncs import make_wrldclim_dsets, make_tave_from_tmax_tmin
 from wldclm_stage1_dwnld_cnvrt_tifs import download_hist_tifs, download_fut_tifs
 from nc_low_level_fns import get_gcm_ssp_lists
+from check_portable_ssd import check_ssd_transfer
 
 WDGT_SIZE_60 = 60
 WDGT_SIZE_90 = 90
@@ -192,6 +193,13 @@ class Form(QWidget):
         w_make_ncs.clicked.connect(self.makeNcs)
         grid.addWidget(w_make_ncs, irow, 2)
 
+        w_check_ssd = QPushButton('Check PortableSSD')
+        helpText = 'Check PortableSSD data transfer progress'
+        w_check_ssd.setToolTip(helpText)
+        w_check_ssd.setFixedWidth(WDGT_SIZE_110)
+        w_check_ssd.clicked.connect(self.checkPortable)
+        grid.addWidget(w_check_ssd, irow, 4)
+
         # ==================
         w_save = QPushButton('Save', self)
         grid.addWidget(w_save, irow, 5)
@@ -216,6 +224,16 @@ class Form(QWidget):
         self.setGeometry(300, 300, 650, 250)
         self.setWindowTitle('Functions to generate NetCDF files from the WorldClim data website')
         read_config_file(self)
+
+        # ============================================================================================
+
+    def checkPortable(self):
+        """
+        C
+        """
+        check_ssd_transfer(self)
+
+        return
 
     # ============================================================================================
     def chckDwnldButts(self, gcms_flag=True):
@@ -264,7 +282,7 @@ class Form(QWidget):
 
     def exitClicked(self, exit_flag):
         """
-
+        C
         """
         write_config_file(self)
         if exit_flag:
