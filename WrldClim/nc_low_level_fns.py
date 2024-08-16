@@ -1,12 +1,11 @@
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Name:        nc_low_level_fns.py
 # Purpose:     Functions to create and write to netCDF files and return latitude and longitude indices
 # Author:      Mike Martin
 # Created:     25/01/2020
 # Description: taken from netcdf_funcs.py in obsolete project PstPrcssNc
 # Licence:     <your licence>
-#-------------------------------------------------------------------------------
-#!/usr/bin/env python
+# -------------------------------------------------------------------------------
 
 __prog__ = 'nc_low_level_fns.py'
 __version__ = '0.0.0'

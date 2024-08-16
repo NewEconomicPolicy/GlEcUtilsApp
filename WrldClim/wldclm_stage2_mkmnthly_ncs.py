@@ -1,11 +1,11 @@
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Name:
 # Purpose:     main function to process Spec results
 # Author:      Mike Martin
 # Created:     11/12/2015
 # Licence:     <your licence>
 # Comments:    Global warming potential(GWP)
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 
 __prog__ = 'eclips_reorg.py'
 __version__ = '0.0.1'
@@ -37,7 +37,7 @@ MISSING_VALUE = -999.0
 
 def make_wrldclim_dsets(form, gcm, ssp):
     """
-
+    C
     """
     delete_flag = form.w_del_nc.isChecked()
 

@@ -23,7 +23,7 @@ from set_up_logging import set_up_logging
 # foe setup and config files
 # ==========================
 APPLIC_STR = 'netcdf_wrldclim_utils'
-SETTINGS_LIST = ['config_dir', 'log_dir', 'fname_png', 'wthr_dir']
+SETTINGS_LIST = ['config_dir', 'log_dir', 'fname_png', 'wthr_dir', 'wget_exe']
 USER_SETTINGS_LIST = ['overwrite', 'ssp_indx', 'gcm_indx', 'pop_hist_flag', 'pop_fut_flag']
 sleepTime = 5
 
