@@ -16,24 +16,49 @@ from os import listdir
 
 def check_ssd_transfer(form):
     """
-    C
+    Check and repair local RCP weather
+    Copy data from the external SSD to effect repair
     """
-    root_dir = form.settings['ssd_root_dir']
+    report_flag = False
+    ssd_root_dir = form.settings['ssd_root_dir']
+    local_root_dir = form.settings['ssd_root_dir']  #  TODO:
 
-    nfiles = 0
-    for short_dir in listdir(root_dir):
-        high_lvl_dir = join(root_dir, short_dir)
-        if short_dir == 'ECOSSE_RCP':
-            high_lvl_dirs = listdir(high_lvl_dir)
-            ndirs = len(high_lvl_dirs)
-            print(high_lvl_dir + ' N RCPs: ' + str(ndirs))
+    # expecting ECOSSE_LTA and ECOSSE_RCP
+    # ===================================
+    for short_dir in listdir(local_root_dir):
+        high_lvl_dir = join(local_root_dir, short_dir)
 
-            for short_rcp in high_lvl_dirs:
-                rcp_dir = join(root_dir, short_dir, short_rcp)
-                ngood_coords, nbad_coords = 2*[0]
-                bad_coords_dict = {}
-                for coord_dir in listdir(rcp_dir):
-                    long_coord_dir = join(rcp_dir, coord_dir)
+        if short_dir != 'ECOSSE_RCP':
+            print('\nIgnoring high level directory: ' + high_lvl_dir)
+            continue
+
+        # gather RCP and realisation directories e.g. ['rcp26_01', 'rcp26_04', 'rcp26_06', ....]
+        # ======================================================================================
+        medium_lvl_dirs = listdir(high_lvl_dir)
+        ndirs = len(medium_lvl_dirs)
+        print('\nChecking: ' + high_lvl_dir + '\tnumber of RCPs: ' + str(ndirs) + '\n')
+
+        for short_rcp in medium_lvl_dirs:
+            rcp_dir = join(local_root_dir, short_dir, short_rcp)
+
+            # check integrity file for this RCP and realisation e.g. rcp60_06
+            # ===============================================================
+            skip_fn = join(rcp_dir, 'skip_flag.txt')
+            if isfile(skip_fn):
+                with open(skip_fn, 'r') as fskip:
+                    integrity = fskip.read()
+                    if integrity == 'OK':
+                        if report_flag:
+                            print(rcp_dir + ' is OK')
+                        continue
+
+            # gather site directories for this RCP and realisation e.g. 100500_478500
+            # =======================================================================
+            ngood_coords, nbad_coords = 2*[0]
+            bad_coords_dict = {}
+            for coord_dir in listdir(rcp_dir):
+                long_coord_dir = join(rcp_dir, coord_dir)
+                if isdir(long_coord_dir):
                     nfiles = len(listdir(long_coord_dir))
                     if nfiles == 60:
                         ngood_coords += 1
@@ -41,10 +66,15 @@ def check_ssd_transfer(form):
                         nbad_coords += 1
                         bad_coords_dict[coord_dir] = nfiles
 
-                print(rcp_dir + ' has {} good and {} bad coords'.format(ngood_coords, nbad_coords))
-                if nbad_coords > 0:
-                    print('bad coords: ' + str(bad_coords_dict) + '\n')
-        else:
-            print('Ignoring ' + high_lvl_dir)
+            # report and repair
+            # =================
+            print('\t' + short_rcp + ' has {} good and {} bad coords'.format(ngood_coords, nbad_coords))
+            if nbad_coords == 0:
+                with open(skip_fn, 'w') as fskip:
+                    fskip.write('OK')
+            else:
+                print('bad coords: ' + str(bad_coords_dict) + '\n')
+                with open(skip_fn, 'w') as fskip:
+                    fskip.write('Bad')
 
     return
