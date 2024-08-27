@@ -23,7 +23,7 @@ from plant_input_funcs import (regrid_yields, convert_joe_plant_inputs_to_nc, sp
                                                                                         split_check_sowing_dates)
 from make_biofuel_inpt_file import main_biofuel
 from jennifer_fns import filter_openfoodfacts_csv, edit_mngmnt
-from jon_fns import copy_jon_lta_data, copy_jon_wthr_data, create_bash_script, identify_ssd, integrity_check
+from jon_fns import copy_jon_lta_data, copy_jon_wthr_data, create_bash_script, identify_ssd
 
 WARNING_STR = '*** Warning *** '
 
@@ -275,9 +275,9 @@ class Form(QWidget):
 
     def dataIntegrity(self):
         """
-        C
+        Cc integrity_check(self)
          """
-        integrity_check(self)
+
 
         return
 
