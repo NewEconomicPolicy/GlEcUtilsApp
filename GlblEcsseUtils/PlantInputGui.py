@@ -209,6 +209,12 @@ class Form(QWidget):
         w_biofuel.clicked.connect(self.biofuelDatasetClicked)
 
         irow += 1
+        w_integrity = QPushButton('Integrity')
+        helpText = 'check data Integrity'
+        w_integrity.setToolTip(helpText)
+        grid.addWidget(w_integrity, irow, 0)
+        w_integrity.clicked.connect(self.dataIntegrity)
+
         icol = 1
         w_edt_mngmnt = QPushButton('Edit mngmnt file')
         helpText = 'Edit management file'
@@ -267,6 +273,14 @@ class Form(QWidget):
             self.close()
             sys.exit()
 
+    def dataIntegrity(self):
+        """
+        Cc integrity_check(self)
+         """
+
+
+        return
+
     def fetchOutDir(self):
         """
         select output directory
@@ -283,12 +297,13 @@ class Form(QWidget):
         """
         check SSD is accessible
         """
+        out_dir = self.w_lbl_outdir.text()
         ssd_found, use_drive, prtbl_ssd = identify_ssd()
         if ssd_found:
             if lta_flag:
-                copy_jon_lta_data(self, use_drive)
+                copy_jon_lta_data(self, use_drive, out_dir)
             else:
-                copy_jon_wthr_data(self, use_drive)
+                copy_jon_wthr_data(self, use_drive, out_dir)
         else:
             print(WARNING_STR + prtbl_ssd + ' not accessible')
 
