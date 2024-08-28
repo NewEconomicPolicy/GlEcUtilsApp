@@ -26,7 +26,7 @@ def check_ssd_transfer(form):
     """
     report_flag = False
     ssd_src_dir = form.settings['ssd_src_dir']
-    dest_root_dir = form.settings['ssd_dest_dir']  #  TODO:
+    dest_root_dir = form.settings['ssd_dest_dir']
 
     # establish definitive list of coords
     # ===================================
