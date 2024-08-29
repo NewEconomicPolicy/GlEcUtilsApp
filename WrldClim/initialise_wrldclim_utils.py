@@ -23,7 +23,7 @@ from set_up_logging import set_up_logging
 # foe setup and config files
 # ==========================
 APPLIC_STR = 'netcdf_wrldclim_utils'
-SETTINGS_LIST = ['config_dir', 'log_dir', 'fname_png', 'ssd_root_dir', 'wthr_dir', 'wget_exe']
+SETTINGS_LIST = ['config_dir', 'log_dir', 'fname_png', 'ssd_src_dir', 'ssd_dest_dir', 'wthr_dir', 'wget_exe']
 USER_SETTINGS_LIST = ['overwrite', 'ssp_indx', 'gcm_indx', 'pop_hist_flag', 'pop_fut_flag']
 sleepTime = 5
 
@@ -35,7 +35,6 @@ def initiation(form):
     '''
     # retrieve settings
     # =================
-
     form.settings = _read_setup_file()
     form.settings['config_file'] = normpath(form.settings['config_dir'] + '/' + APPLIC_STR + '_config.json')
     set_up_logging(form, APPLIC_STR)
@@ -71,7 +70,7 @@ def _read_setup_file():
     settings = setup['setup']
     for key in SETTINGS_LIST:
         if key not in settings:
-            print('*** Error *** setting {} is required in setup file {} '.format(key, setup_file))
+            print('*** Error *** setting {} is required in setup file:\n\t{} '.format(key, setup_file))
             sleep(sleepTime)
             exit(0)
 
@@ -209,8 +208,12 @@ def _write_default_setup_file(setup_file):
     default_setup = {
         'setup': {
             'config_dir': join(root_dir, 'config'),
+            'fname_png': join(root_dir, 'images', 'World_small.PNG'),
             'log_dir'   : join(root_dir, 'logs'),
-            'fname_png' : join(root_dir, 'Images', 'World_small.PNG')
+            'ssd_dest_dir': 'G:\\PortableSSD',
+            'ssd_src_dir': 'Y:\\PortableSSD',
+            'wget_exe': 'E:\\Freeware\\UnxUtils\\usr\\local\\wbin\\wget.exe',
+            'wthr_dir': 'E:\\WldClim'
         }
     }
     # create setup file

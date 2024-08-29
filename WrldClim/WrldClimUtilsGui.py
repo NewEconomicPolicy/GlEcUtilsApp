@@ -194,7 +194,7 @@ class Form(QWidget):
         grid.addWidget(w_make_ncs, irow, 2)
 
         w_check_ssd = QPushButton('Check PortableSSD')
-        helpText = 'Check PortableSSD data transfer progress'
+        helpText = 'Check PortableSSD data transfer and destination alignment'
         w_check_ssd.setToolTip(helpText)
         w_check_ssd.setFixedWidth(WDGT_SIZE_110)
         w_check_ssd.clicked.connect(self.checkPortable)
