@@ -25,7 +25,7 @@ def check_ssd_transfer(form):
     Assumption: all grid cell coordinates have been transferred but some may be incomplete
                                                             i.e. have less than 60 weather files
     """
-    report_only = False
+    report_only = True
     ssd_src_dir = form.settings['ssd_src_dir']
     dest_root_dir = form.settings['ssd_dest_dir']
     print('\nSanDisk source: ' + ssd_src_dir + '\tDestination directory: ' + dest_root_dir)
