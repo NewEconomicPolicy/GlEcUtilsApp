@@ -6,7 +6,6 @@
 # Description: taken from netcdf_funcs.py in obsolete project PstPrcssNc
 # Licence:     <your licence>
 # -------------------------------------------------------------------------------
-
 __prog__ = 'check_portable_ssd.py'
 __version__ = '0.0.0'
 __author__ = 's03mm5'
@@ -21,18 +20,22 @@ MAX_BAD_COORDS = 10
 
 def check_ssd_transfer(form):
     """
-    Check and repair local RCP weather
+    Check the integrity of and repair any incomplete RCP weather cells for the destination instance
     Copy data from the external SSD to effect repair
+    Assumption: all grid cell coordinates have been transferred but some may be incomplete
+                                                            i.e. have less than 60 weather files
     """
     report_flag = False
     ssd_src_dir = form.settings['ssd_src_dir']
     dest_root_dir = form.settings['ssd_dest_dir']
+    print('\nSanDisk source: ' + ssd_src_dir + '\tDestination directory: ' + dest_root_dir)
 
     # establish definitive list of coords
     # ===================================
     lta_src_dir = join(ssd_src_dir, ECOSSE_LTA)
     rcps = listdir(lta_src_dir)
     all_coords = listdir(join(lta_src_dir, rcps[0]))
+    nall_coords = len(all_coords)
 
     # expecting ECOSSE_LTA and ECOSSE_RCP
     # ===================================
@@ -74,6 +77,10 @@ def check_ssd_transfer(form):
             ngood_coords, nbad_coords, ncopy_coords = 3*[0]
             bad_coords_dict = {}
             coord_dirs = listdir(rcp_dest_dir)
+
+            ncoord_dirs = len(coord_dirs)
+            print('Destination ' + short_rcp + ' has {} coords, expected: {}'.format(ncoord_dirs, nall_coords))
+
             for coord_dir in coord_dirs:
                 long_coord_dir = join(rcp_dest_dir, coord_dir)
                 if isdir(long_coord_dir):

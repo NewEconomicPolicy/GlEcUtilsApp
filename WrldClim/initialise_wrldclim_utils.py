@@ -35,7 +35,6 @@ def initiation(form):
     '''
     # retrieve settings
     # =================
-
     form.settings = _read_setup_file()
     form.settings['config_file'] = normpath(form.settings['config_dir'] + '/' + APPLIC_STR + '_config.json')
     set_up_logging(form, APPLIC_STR)
@@ -209,8 +208,12 @@ def _write_default_setup_file(setup_file):
     default_setup = {
         'setup': {
             'config_dir': join(root_dir, 'config'),
+            'fname_png': join(root_dir, 'images', 'World_small.PNG'),
             'log_dir'   : join(root_dir, 'logs'),
-            'fname_png' : join(root_dir, 'Images', 'World_small.PNG')
+            'ssd_dest_dir': 'G:\\PortableSSD',
+            'ssd_src_dir': 'Y:\\PortableSSD',
+            'wget_exe': 'E:\\Freeware\\UnxUtils\\usr\\local\\wbin\\wget.exe',
+            'wthr_dir': 'E:\\WldClim'
         }
     }
     # create setup file
