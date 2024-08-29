@@ -10,7 +10,7 @@ __prog__ = 'check_portable_ssd.py'
 __version__ = '0.0.0'
 __author__ = 's03mm5'
 
-from shutil import copytree
+from shutil import copytree, rmtree
 from os.path import isfile, splitext, join, isdir, split
 from os import listdir
 
@@ -25,7 +25,7 @@ def check_ssd_transfer(form):
     Assumption: all grid cell coordinates have been transferred but some may be incomplete
                                                             i.e. have less than 60 weather files
     """
-    report_flag = False
+    report_only = False
     ssd_src_dir = form.settings['ssd_src_dir']
     dest_root_dir = form.settings['ssd_dest_dir']
     print('\nSanDisk source: ' + ssd_src_dir + '\tDestination directory: ' + dest_root_dir)
@@ -68,8 +68,7 @@ def check_ssd_transfer(form):
                 with open(skip_fn, 'r') as fskip:
                     integrity = fskip.read()
                     if integrity == 'OK':
-                        if report_flag:
-                            print(rcp_dest_dir + ' is OK')
+                        print(rcp_dest_dir + ' is OK')
                         continue
 
             # gather site directories for this RCP and realisation e.g. 100500_478500
@@ -79,12 +78,12 @@ def check_ssd_transfer(form):
             coord_dirs = listdir(rcp_dest_dir)
 
             ncoord_dirs = len(coord_dirs)
-            print('Destination ' + short_rcp + ' has {} coords, expected: {}'.format(ncoord_dirs, nall_coords))
+            print('\nDestination ' + short_rcp + ' has {} coords, expected: {}'.format(ncoord_dirs, nall_coords))
 
             for coord_dir in coord_dirs:
-                long_coord_dir = join(rcp_dest_dir, coord_dir)
-                if isdir(long_coord_dir):
-                    nfiles = len(listdir(long_coord_dir))
+                dest_dir_coord = join(rcp_dest_dir, coord_dir)
+                if isdir(dest_dir_coord):
+                    nfiles = len(listdir(dest_dir_coord))
                     if nfiles == 60:
                         ngood_coords += 1
                     else:
@@ -92,7 +91,13 @@ def check_ssd_transfer(form):
                         # ======================================
                         src_dir_coord = join(rcp_src_dir, coord_dir)
                         if isdir(src_dir_coord):
-                            copytree(src_dir_coord, join(rcp_dest_dir, coord_dir))
+                            if report_only:
+                                print('nfiles: ' + str(nfiles) + '\tWill copy ' + src_dir_coord + ' to ' ,
+                                      dest_dir_coord)
+                            else:
+                                rmtree(dest_dir_coord)
+                                copytree(src_dir_coord, dest_dir_coord)
+                                print('Copied ' + src_dir_coord + ' to ', dest_dir_coord)
                             ncopy_coords += 1
                         else:
                             if nbad_coords < MAX_BAD_COORDS:
@@ -102,7 +107,7 @@ def check_ssd_transfer(form):
 
             # report and repair
             # =================
-            mess = '\nAlignment of coordinates for: ' + short_rcp
+            mess = 'Alignment of coordinates for: ' + short_rcp
             print( mess + '\t{} good\t{} bad\t{} copied'.format(ngood_coords, nbad_coords, ncopy_coords))
             if nbad_coords == 0:
                 with open(skip_fn, 'w') as fskip:
@@ -113,5 +118,7 @@ def check_ssd_transfer(form):
                 print('\tfirst of ' + str(ncoords) + ' bad coords: ' + bad_keys_str + '\n')
                 with open(skip_fn, 'w') as fskip:
                     fskip.write('Bad')
+
+            print('\n')
 
     return
