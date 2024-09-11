@@ -209,6 +209,16 @@ class Form(QWidget):
         grid.addWidget(w_exit, irow, 6)
         w_exit.clicked.connect(lambda: self.exitClicked(True))
 
+        # ======= furthur operations ========
+        irow += 1
+        w_zip_rcps = QPushButton('Zip RCPs')
+        helpText = 'Check PortableSSD data transfer and destination alignment'
+        w_zip_rcps.setToolTip(helpText)
+        w_zip_rcps.setFixedWidth(WDGT_SIZE_110)
+        w_zip_rcps.clicked.connect(self.checkPortable)
+        grid.addWidget(w_zip_rcps, irow, 4)
+
+
         # ==================
         # add grid to RH vertical box
         rh_vbox.addLayout(grid)

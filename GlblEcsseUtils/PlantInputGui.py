@@ -299,6 +299,7 @@ class Form(QWidget):
         """
         out_dir = self.w_lbl_outdir.text()
         ssd_found, use_drive, prtbl_ssd = identify_ssd()
+        use_drive = 'G:\\PortableSSD\\'
         if ssd_found:
             if lta_flag:
                 copy_jon_lta_data(self, use_drive, out_dir)
