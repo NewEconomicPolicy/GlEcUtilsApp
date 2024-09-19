@@ -20,7 +20,7 @@ from initialise_wrldclim_utils import initiation, read_config_file, write_config
 from wldclm_stage2_mkmnthly_ncs import make_wrldclim_dsets, make_tave_from_tmax_tmin
 from wldclm_stage1_dwnld_cnvrt_tifs import download_hist_tifs, download_fut_tifs
 from nc_low_level_fns import get_gcm_ssp_lists
-from check_portable_ssd import check_ssd_transfer
+from check_portable_ssd import check_ssd_transfer, zip_rcps
 
 WDGT_SIZE_60 = 60
 WDGT_SIZE_90 = 90
@@ -170,7 +170,7 @@ class Form(QWidget):
         irow += 1
         grid.addWidget(QLabel(' '), irow, 0)
 
-        # ======= operations ========
+        # ==================== operations ======================
         irow += 1
         w_dwnld_hist = QPushButton('Download historic')
         helpText = 'Download historic datasets'
@@ -198,7 +198,7 @@ class Form(QWidget):
         w_check_ssd.setToolTip(helpText)
         w_check_ssd.setFixedWidth(WDGT_SIZE_110)
         w_check_ssd.clicked.connect(self.checkPortable)
-        grid.addWidget(w_check_ssd, irow, 4)
+        grid.addWidget(w_check_ssd, irow, 3)
 
         # ==================
         w_save = QPushButton('Save', self)
@@ -211,13 +211,12 @@ class Form(QWidget):
 
         # ======= furthur operations ========
         irow += 1
-        w_zip_rcps = QPushButton('Zip RCPs')
-        helpText = 'Check PortableSSD data transfer and destination alignment'
+        w_zip_rcps = QPushButton('Create Zip RCPs')
+        helpText = 'Zip RCPs '
         w_zip_rcps.setToolTip(helpText)
         w_zip_rcps.setFixedWidth(WDGT_SIZE_110)
-        w_zip_rcps.clicked.connect(self.checkPortable)
+        w_zip_rcps.clicked.connect(self.zipRCPs)
         grid.addWidget(w_zip_rcps, irow, 4)
-
 
         # ==================
         # add grid to RH vertical box
@@ -236,6 +235,14 @@ class Form(QWidget):
         read_config_file(self)
 
         # ============================================================================================
+
+    def zipRCPs(self):
+        """
+        C
+        """
+        zip_rcps(self)
+
+        return
 
     def checkPortable(self):
         """

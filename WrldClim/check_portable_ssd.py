@@ -13,10 +13,44 @@ __author__ = 's03mm5'
 from shutil import copytree, rmtree
 from os.path import isfile, splitext, join, isdir, split
 from os import listdir
+from zipfile import ZipFile, BadZipFile
+from time import time
 
+ERROR_STR = '*** Error *** '
 ECOSSE_LTA = 'ECOSSE_LTA'
 ECOSSE_RCP = 'ECOSSE_RCP'
 MAX_BAD_COORDS = 10
+SRC_DIR = 'D:\\PortableSSD\\ECOSSE_RCP'
+
+def zip_rcps(form):
+    """
+    C
+    """
+    for rcp_short in listdir(SRC_DIR):
+        out_dir = join('D:\\PortableSSD', 'zipfiles')
+        out_fn = join(out_dir, rcp_short)
+        out_fn_zip = out_fn + '.zip'
+        if isfile(out_fn_zip):
+            print(out_fn_zip + ' exists, will skip')
+        else:
+            zf = ZipFile(out_fn_zip, mode='w')
+            src_rcp_dir = join(SRC_DIR, rcp_short)
+            print('Creating: ' + out_fn_zip + ' from: ' + src_rcp_dir)
+            t1 = time()
+            try:
+                for coord_dir in listdir(src_rcp_dir ):
+
+
+
+                    zf.write(src_rcp_dir)
+            except BadZipFile as err:
+                print(ERROR_STR = '*** Error *** ' + str(err))
+                pass
+
+            zf.close()
+            t2 = time()
+            print('Created: ' + out_fn_zip + ' after: ' + str(int((t2 - t1) / 60)) + ' minutes')
+    return
 
 def check_ssd_transfer(form):
     """
