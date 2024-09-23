@@ -130,7 +130,7 @@ def read_config_file(form):
     # ===============
     form.w_combo10.setCurrentIndex(config[grp]['ssp_indx'])
     form.w_combo11.setCurrentIndex(config[grp]['gcm_indx'])
-    form.w_lbl_srcdir.setText(config[grp]['src_dir'])
+    form.w_lbl_srcdir.setText(str(config[grp]['src_dir']))
 
     # set check boxes
     # ===============

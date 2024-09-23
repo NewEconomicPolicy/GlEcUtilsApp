@@ -20,7 +20,7 @@ from pandas import read_csv
 from time import time, sleep
 import subprocess
 from glob import glob
-from distutils.dir_util import copy_tree
+from shutil import copytree
 
 def rename_txt_to_json(ref_dir):
     '''

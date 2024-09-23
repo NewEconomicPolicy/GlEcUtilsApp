@@ -13,7 +13,7 @@ __author__ = 's03mm5'
 from shutil import copytree, rmtree
 from os.path import isfile, splitext, join, isdir, split
 from os import listdir
-from zipfile import ZipFile, BadZipFile
+from subprocess import Popen, PIPE, STDOUT
 from time import time
 
 ERROR_STR = '*** Error *** '
@@ -30,7 +30,8 @@ def zip_rcps(form):
     https://documentation.help/7-Zip-18.0/start.htm
     """
     if not isfile(ARCHIVER_7Z_EXE):
-        pass
+        print(ERROR_STR + ARCHIVER_7Z_EXE + ' does not exist')
+        return
 
     src_dir = form.w_lbl_srcdir.text()
     out_dir = join(split(src_dir)[0], 'zipfiles')
@@ -45,24 +46,16 @@ def zip_rcps(form):
         if isfile(out_fn_zip):
             print(out_fn_zip + ' exists, will skip')
         else:
-            print('\nCreating: ' + out_fn_zip + ' from:\t' + src_rcp_dir)
+            print('\nCreating: ' + out_fn_zip + '\tfrom:\t' + src_rcp_dir)
             t1 = time()
-
-
-            '''            
-            zf = ZipFile(out_fn_zip, mode='w')
             try:
-                for coord_dir in listdir(src_rcp_dir ):
-                    zf.write(src_rcp_dir)
-            except BadZipFile as err:
-                print(ERROR_STR = '*** Error *** ' + str(err))
-                pass
-
-            zf.close()
-            '''
-
-            t2 = time()
-            print('Created: ' + out_fn_zip + ' after: ' + str(int((t2 - t1) / 60)) + ' minutes')
+                cmd = ARCHIVER_7Z_EXE + ' a ' + rcp_short + '.zip ' + ' * '
+                new_inst = Popen(cmd, shell=False, stdin=PIPE, stderr=STDOUT)
+            except OSError as err:
+                print(ERROR_STR + str(err))
+            else:
+                t2 = time()
+                print('Created: ' + out_fn_zip + ' after: ' + str(int((t2 - t1) / 60)) + ' minutes')
     return
 
 def check_ssd_transfer(form):
