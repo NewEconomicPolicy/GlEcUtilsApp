@@ -20,34 +20,47 @@ ERROR_STR = '*** Error *** '
 ECOSSE_LTA = 'ECOSSE_LTA'
 ECOSSE_RCP = 'ECOSSE_RCP'
 MAX_BAD_COORDS = 10
-SRC_DIR = 'D:\\PortableSSD\\ECOSSE_RCP'
+
+ARCHIVER_7Z_EXE = 'C:\\Program Files\\7-Zip\\7z.exe'
 
 def zip_rcps(form):
     """
-    C
+    extend PATH env var:     set PATH=%PATH%;C:\Program Files\7-Zip
+    7z a rcp45_04.zip *
+    https://documentation.help/7-Zip-18.0/start.htm
     """
-    for rcp_short in listdir(SRC_DIR):
-        out_dir = join('D:\\PortableSSD', 'zipfiles')
+    if not isfile(ARCHIVER_7Z_EXE):
+        pass
+
+    src_dir = form.w_lbl_srcdir.text()
+    out_dir = join(split(src_dir)[0], 'zipfiles')
+    for rcp_short in listdir(src_dir):
+        src_rcp_dir = join(src_dir, rcp_short)
+        if not isdir(src_rcp_dir):
+            print('Skipping ' + src_rcp_dir)
+            continue
+
         out_fn = join(out_dir, rcp_short)
         out_fn_zip = out_fn + '.zip'
         if isfile(out_fn_zip):
             print(out_fn_zip + ' exists, will skip')
         else:
-            zf = ZipFile(out_fn_zip, mode='w')
-            src_rcp_dir = join(SRC_DIR, rcp_short)
-            print('Creating: ' + out_fn_zip + ' from: ' + src_rcp_dir)
+            print('\nCreating: ' + out_fn_zip + ' from:\t' + src_rcp_dir)
             t1 = time()
+
+
+            '''            
+            zf = ZipFile(out_fn_zip, mode='w')
             try:
                 for coord_dir in listdir(src_rcp_dir ):
-
-
-
                     zf.write(src_rcp_dir)
             except BadZipFile as err:
                 print(ERROR_STR = '*** Error *** ' + str(err))
                 pass
 
             zf.close()
+            '''
+
             t2 = time()
             print('Created: ' + out_fn_zip + ' after: ' + str(int((t2 - t1) / 60)) + ' minutes')
     return

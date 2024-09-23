@@ -11,10 +11,13 @@ __version__ = '0.0.1'
 __author__ = 's03mm5'
 
 import sys
+from os.path import isdir, join, normpath, splitdrive
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import (QLabel, QWidget, QApplication, QHBoxLayout, QVBoxLayout, QGridLayout,
                                 QPushButton, QCheckBox, QFileDialog, QComboBox)
+
 
 from initialise_wrldclim_utils import initiation, read_config_file, write_config_file
 from wldclm_stage2_mkmnthly_ncs import make_wrldclim_dsets, make_tave_from_tmax_tmin
@@ -166,6 +169,22 @@ class Form(QWidget):
         w_all_ssps.clicked.connect(lambda: self.chckDwnldButts(False))
         self.w_all_ssps = w_all_ssps
 
+        # output directory
+        # =================
+        irow += 1
+        w_src_dir = QPushButton("Source dir")
+        helpText = 'Directory containing PortableSS ECOSSE_RCP data'
+        w_src_dir.setToolTip(helpText)
+        grid.addWidget(w_src_dir, irow, 1)
+        w_src_dir.clicked.connect(self.fetchSrcDir)
+
+        w_lbl_srcdir = QLabel('')
+        grid.addWidget(w_lbl_srcdir, irow, 2, 1, 5)
+        self.w_lbl_srcdir = w_lbl_srcdir
+
+        irow += 1
+        grid.addWidget(QLabel(), irow, 1)  # spacer
+
         # ========== spacer
         irow += 1
         grid.addWidget(QLabel(' '), irow, 0)
@@ -234,7 +253,19 @@ class Form(QWidget):
         self.setWindowTitle('Functions to generate NetCDF files from the WorldClim data website')
         read_config_file(self)
 
-        # ============================================================================================
+    # ============================================================================================
+
+    def fetchSrcDir(self):
+        """
+        select output directory
+        """
+        dirname = self.w_lbl_srcdir.text()
+        dirname = QFileDialog.getExistingDirectory(self, 'Select directory for PortableSSD ECOSSE_RCP files', dirname)
+        if dirname != '':
+            if isdir(dirname):
+                self.w_lbl_srcdir.setText(normpath(dirname))
+
+        return
 
     def zipRCPs(self):
         """

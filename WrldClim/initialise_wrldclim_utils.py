@@ -24,7 +24,7 @@ from set_up_logging import set_up_logging
 # ==========================
 APPLIC_STR = 'netcdf_wrldclim_utils'
 SETTINGS_LIST = ['config_dir', 'log_dir', 'fname_png', 'ssd_src_dir', 'ssd_dest_dir', 'wthr_dir', 'wget_exe']
-USER_SETTINGS_LIST = ['overwrite', 'ssp_indx', 'gcm_indx', 'pop_hist_flag', 'pop_fut_flag']
+USER_SETTINGS_LIST = ['overwrite', 'ssp_indx', 'gcm_indx', 'src_dir', 'pop_hist_flag', 'pop_fut_flag']
 sleepTime = 5
 
 ERROR_STR = '*** Error *** '
@@ -130,6 +130,7 @@ def read_config_file(form):
     # ===============
     form.w_combo10.setCurrentIndex(config[grp]['ssp_indx'])
     form.w_combo11.setCurrentIndex(config[grp]['gcm_indx'])
+    form.w_lbl_srcdir.setText(config[grp]['src_dir'])
 
     # set check boxes
     # ===============
@@ -161,6 +162,7 @@ def write_config_file(form, message_flag = True):
             'overwrite':  form.w_del_nc.isChecked(),
             'pop_fut_flag': form.w_pop_fut.isChecked(),
             'pop_hist_flag': form.w_pop_hist.isChecked(),
+            'src_dir': form.w_lbl_srcdir.text(),
             'ssp_indx': form.w_combo10.currentIndex(),
             'gcm_indx': form.w_combo11.currentIndex()
         }
