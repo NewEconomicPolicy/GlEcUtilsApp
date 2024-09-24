@@ -169,6 +169,10 @@ class Form(QWidget):
         w_all_ssps.clicked.connect(lambda: self.chckDwnldButts(False))
         self.w_all_ssps = w_all_ssps
 
+        # ========== spacer
+        irow += 1
+        grid.addWidget(QLabel(' '), irow, 0)
+
         # output directory
         # =================
         irow += 1
