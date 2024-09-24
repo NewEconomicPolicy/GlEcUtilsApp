@@ -234,6 +234,7 @@ class Form(QWidget):
         helpText = 'Zip RCPs '
         w_zip_rcps.setToolTip(helpText)
         w_zip_rcps.setFixedWidth(WDGT_SIZE_110)
+        w_zip_rcps.setEnabled(False)
         w_zip_rcps.clicked.connect(self.zipRCPs)
         grid.addWidget(w_zip_rcps, irow, 4)
 

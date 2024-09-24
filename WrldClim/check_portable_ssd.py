@@ -12,9 +12,9 @@ __author__ = 's03mm5'
 
 from shutil import copytree, rmtree
 from os.path import isfile, splitext, join, isdir, split
-from os import listdir
+from os import listdir, getcwd, chdir
 from subprocess import Popen, PIPE, STDOUT
-from time import time
+from time import time, sleep
 
 ERROR_STR = '*** Error *** '
 ECOSSE_LTA = 'ECOSSE_LTA'
@@ -48,6 +48,8 @@ def zip_rcps(form):
         else:
             print('\nCreating: ' + out_fn_zip + '\tfrom:\t' + src_rcp_dir)
             t1 = time()
+            curr_dir = getcwd()
+            chdir(src_rcp_dir)
             try:
                 cmd = ARCHIVER_7Z_EXE + ' a ' + rcp_short + '.zip ' + ' * '
                 new_inst = Popen(cmd, shell=False, stdin=PIPE, stderr=STDOUT)
@@ -56,6 +58,16 @@ def zip_rcps(form):
             else:
                 t2 = time()
                 print('Created: ' + out_fn_zip + ' after: ' + str(int((t2 - t1) / 60)) + ' minutes')
+
+                sleep(2)
+                while True:
+                    if new_inst.poll() is None:
+                        print('job ' + str(new_inst.pid) + ' is still running')
+                        sleep(5)
+                    else:
+                        break
+
+            chdir(curr_dir)
     return
 
 def check_ssd_transfer(form):
